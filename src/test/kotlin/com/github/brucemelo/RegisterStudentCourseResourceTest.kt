@@ -1,15 +1,16 @@
 package com.github.brucemelo
 
-import com.github.brucemelo.domain.Course
-import com.github.brucemelo.domain.CourseService
 import com.github.brucemelo.domain.Student
-import com.github.brucemelo.domain.StudentService
-import com.github.brucemelo.web.RegisterStudentCourseDTO
+import com.github.brucemelo.service.CourseService
+import com.github.brucemelo.service.StudentService
+import com.github.brucemelo.web.NewCourse
+import com.github.brucemelo.web.NewRegisterStudentCourse
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
 import jakarta.inject.Inject
 import jakarta.ws.rs.core.HttpHeaders
 import jakarta.ws.rs.core.MediaType
+import org.jboss.resteasy.reactive.RestResponse.StatusCode
 import org.junit.jupiter.api.Test
 
 @QuarkusTest
@@ -23,51 +24,51 @@ class RegisterStudentCourseResourceTest : ResourceTest() {
 
     @Test
     fun `register student`() {
-        val course = courseService.save(Course().apply { name = "caa1" })
-        val student: Student = studentService.save(Student().apply { name = "s24" })
+        val course = courseService.save(NewCourse(name = "course1"))
+        val student: Student = studentService.save(Student().apply { name = "name1" })
 
-        val registerStudentCourseDTO = RegisterStudentCourseDTO(
+        val newRegisterStudentCourse = NewRegisterStudentCourse(
             idStudent = student.id!!,
             idCourse = course.id!!)
 
         given()
-            .body(registerStudentCourseDTO)
+            .body(newRegisterStudentCourse)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
             .`when`().post("/register-students")
             .then()
-            .statusCode(201)
+            .statusCode(StatusCode.CREATED)
     }
 
     @Test
     fun `register student - throws Course not found exception`() {
-        studentService.save(Student().apply { name = "s2333" })
+        studentService.save(Student().apply { name = "name1" })
 
-        val registerStudentCourseDTO = RegisterStudentCourseDTO(
+        val newRegisterStudentCourse = NewRegisterStudentCourse(
             idStudent = 1,
             idCourse = 1)
 
         given()
-            .body(registerStudentCourseDTO)
+            .body(newRegisterStudentCourse)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
             .`when`().post("/register-students")
             .then()
-            .statusCode(404)
+            .statusCode(StatusCode.NOT_FOUND)
     }
 
     @Test
     fun `register student - throws Student not found exception`() {
-        courseService.save(Course().apply { name = "course123" })
+        courseService.save(NewCourse(name = "course1"))
 
-        val registerStudentCourseDTO = RegisterStudentCourseDTO(
+        val newRegisterStudentCourse = NewRegisterStudentCourse(
             idStudent = 1,
             idCourse = 1)
 
         given()
-            .body(registerStudentCourseDTO)
+            .body(newRegisterStudentCourse)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
             .`when`().post("/register-students")
             .then()
-            .statusCode(404)
+            .statusCode(StatusCode.NOT_FOUND)
     }
 
 }

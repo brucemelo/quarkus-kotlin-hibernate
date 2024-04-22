@@ -1,0 +1,30 @@
+###
+POST http://localhost:8080/api/students
+Content-Type: application/json
+
+{
+  "name": "student1"
+}
+
+###
+GET http://localhost:8080/api/students
+
+###
+POST http://localhost:8080/api/courses
+Content-Type: application/json
+
+{
+  "name": "course1"
+}
+
+###
+GET http://localhost:8080/api/courses
+
+###
+POST http://localhost:8080/api/register-students
+Content-Type: application/json
+
+{
+  "idStudent": 1,
+  "idCourse": 1
+}

@@ -1,26 +1,28 @@
 package com.github.brucemelo.web
 
-import com.github.brucemelo.domain.Course
-import com.github.brucemelo.domain.CourseService
+import com.github.brucemelo.service.CourseService
+import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
-import jakarta.ws.rs.core.Response
+import org.jboss.resteasy.reactive.RestResponse
+import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder;
 
-data class CourseDTO(var name: String, val students: List<StudentDTO> = mutableListOf())
+data class CourseWithStudents(var name: String, val students: List<NewStudent> = mutableListOf())
+data class NewCourse(var name: String)
 
 @Path("/courses")
 class CourseResource(private val courseService: CourseService) {
 
     @GET
-    fun listAll(): List<CourseDTO> = courseService.listAll()
-        .map { CourseDTO(it.name, students = it.studentCourse.map { v -> StudentDTO(name = v.student.name) }) }
+    fun listAll(): List<CourseWithStudents> = courseService.listAll()
+        .map { CourseWithStudents(it.name, students = it.studentCourse.map { v -> NewStudent(name = v.student.name) }) }
 
     @POST
-    fun save(dto: CourseDTO): Response {
-        val course = Course().apply { name = dto.name }
-        courseService.save(course)
-        return Response.status(Response.Status.CREATED).entity(CourseDTO(course.name)).build()
+    fun save(newCourse: NewCourse): RestResponse<NewCourse> {
+        if (newCourse.name.isBlank()) throw BadRequestException("Course name cannot be blank.")
+        courseService.save(newCourse)
+        return ResponseBuilder.create(RestResponse.Status.CREATED, NewCourse(name = newCourse.name)).build()
     }
 
 }

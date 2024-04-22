@@ -1,5 +1,18 @@
 # Java 21 - Quarkus 3.9 - Kotlin - Hibernate
 
+## Requirements
+
+ - Java 21
+ - Docker (running)
+
+## Tech stack
+
+- Kotlin
+- Quarkus 3.9
+- Hibernate
+- PostgreSQL
+- Docker
+
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
